@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cli-ai-companion"
+version = "0.1.0"
+description = "Production-grade CLI AI Companion with long-term memory, fact reconciliation, and persona guardrails"
+authors = [{ name = "Candidate" }]
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "pydantic>=2.6.0,<3.0.0",
+    "litellm>=1.40.0,<2.0.0",
+    "rich>=13.7.0,<14.0.0",
+    "typer>=0.12.0,<1.0.0",
+    "numpy>=1.24.0,<3.0.0",
+    "psutil>=5.9.0,<7.0.0",
+    "python-dotenv>=1.0.0,<2.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0,<9.0.0",
+    "groq>=0.9.0,<2.0.0",
+    "google-generativeai>=0.8.0,<1.0.0",
+]
+
+[project.scripts]
+companion = "main:app"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::UserWarning",
+]

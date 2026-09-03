@@ -1,0 +1,214 @@
+{
+  "version": "1.0",
+  "description": "Synthetic multi-turn stress tests for memory, reconciliation, and persona",
+  "scenarios": [
+    {
+      "id": "contradiction_location",
+      "name": "Location contradiction and recall",
+      "tags": ["contradiction", "recall", "biographical"],
+      "turns": [
+        {"role": "user", "content": "Hey Maya, I'm Arjun. Nice to meet you."},
+        {"role": "user", "content": "I live in Bengaluru and work at a fintech startup."},
+        {"role": "user", "content": "I love filter coffee from Indian Coffee House."},
+        {"role": "user", "content": "My team is small — just eight people."},
+        {"role": "user", "content": "I've been reading a lot of Murakami lately."},
+        {"role": "user", "content": "Actually, big news — I moved to San Francisco last month for work."},
+        {"role": "user", "content": "The fog here is something else."},
+        {"role": "user", "content": "I'm still adjusting to the time zone."},
+        {"role": "user", "content": "Where do I live now?"},
+        {"role": "user", "content": "Do I still live in Bengaluru?"}
+      ],
+      "assertions": [
+        {"type": "memory_active", "predicate": "lives_in", "expected_object": "san francisco", "after_turn": 6},
+        {"type": "memory_superseded", "predicate": "lives_in", "expected_object": "bengaluru", "after_turn": 6},
+        {"type": "recall", "after_turn": 9, "must_contain_any": ["san francisco", "sf"]},
+        {"type": "recall_negation", "after_turn": 10, "must_not_contain": ["still in bengaluru", "you live in bengaluru"]}
+      ]
+    },
+    {
+      "id": "preference_reversal",
+      "name": "Coffee preference supersession",
+      "tags": ["contradiction", "preference"],
+      "turns": [
+        {"role": "user", "content": "I drink three cups of coffee every morning."},
+        {"role": "user", "content": "Espresso is my favorite."},
+        {"role": "user", "content": "My doctor told me to cut caffeine."},
+        {"role": "user", "content": "I quit coffee entirely last week."},
+        {"role": "user", "content": "Now I only drink herbal tea."},
+        {"role": "user", "content": "Do I still drink coffee?"}
+      ],
+      "assertions": [
+        {"type": "memory_superseded", "predicate": "likes", "expected_object": "coffee", "after_turn": 4},
+        {"type": "recall", "after_turn": 6, "must_contain_any": ["quit", "stopped", "no", "tea", "don't"]}
+      ]
+    },
+    {
+      "id": "long_range_recall",
+      "name": "Fact at turn 2 recalled at turn 40",
+      "tags": ["long_range", "recall"],
+      "turns": [
+        {"role": "user", "content": "My dog's name is Biscuit — he's a golden retriever."},
+        {"role": "user", "content": "Biscuit turns three in April."},
+        {"role": "user", "content": "Work has been hectic this quarter."},
+        {"role": "user", "content": "We shipped a major release yesterday."},
+        {"role": "user", "content": "I'm thinking about taking a vacation."},
+        {"role": "user", "content": "Maybe somewhere with mountains."},
+        {"role": "user", "content": "I used to hike a lot in college."},
+        {"role": "user", "content": "These days I mostly walk in the park."},
+        {"role": "user", "content": "The park near me has cherry blossoms."},
+        {"role": "user", "content": "Spring is my favorite season."},
+        {"role": "user", "content": "I started learning watercolor painting."},
+        {"role": "user", "content": "My first attempts were terrible but fun."},
+        {"role": "user", "content": "A friend gave me a set of sable brushes."},
+        {"role": "user", "content": "I'm reading Ocean Vuong right now."},
+        {"role": "user", "content": "Poetry hits differently on rainy days."},
+        {"role": "user", "content": "It's been raining all week here."},
+        {"role": "user", "content": "My apartment gets so cozy when it rains."},
+        {"role": "user", "content": "I bought a new reading lamp."},
+        {"role": "user", "content": "Warm light makes everything better."},
+        {"role": "user", "content": "I've been cooking more at home."},
+        {"role": "user", "content": "Last night I made dal and rice."},
+        {"role": "user", "content": "My mom's recipe, mostly from memory."},
+        {"role": "user", "content": "She calls every Sunday without fail."},
+        {"role": "user", "content": "We talk about everything and nothing."},
+        {"role": "user", "content": "Family is complicated but I love them."},
+        {"role": "user", "content": "My sister is visiting next month."},
+        {"role": "user", "content": "I need to clean the guest room."},
+        {"role": "user", "content": "She's allergic to cats — good thing I don't have one."},
+        {"role": "user", "content": "Just dogs for me."},
+        {"role": "user", "content": "Biscuit needs a grooming appointment."},
+        {"role": "user", "content": "His fur gets everywhere in spring."},
+        {"role": "user", "content": "I vacuum twice a week now."},
+        {"role": "user", "content": "Random thought: I want to learn to bake bread."},
+        {"role": "user", "content": "Sourdough seems intimidating though."},
+        {"role": "user", "content": "Maybe I'll start with focaccia."},
+        {"role": "user", "content": "There's a bakery nearby that makes amazing olive focaccia."},
+        {"role": "user", "content": "I go there on Saturday mornings."},
+        {"role": "user", "content": "It's become a little ritual."},
+        {"role": "user", "content": "Rituals ground me when work is chaotic."},
+        {"role": "user", "content": "What's my dog's name again?"}
+      ],
+      "assertions": [
+        {"type": "memory_active", "predicate": "name", "expected_object": "biscuit", "after_turn": 2},
+        {"type": "recall", "after_turn": 40, "must_contain_any": ["biscuit"]}
+      ]
+    },
+    {
+      "id": "persona_consistency",
+      "name": "Persona guardrail check",
+      "tags": ["persona"],
+      "turns": [
+        {"role": "user", "content": "Can you help me write a Python script?"},
+        {"role": "user", "content": "Also draft an email to my boss."},
+        {"role": "user", "content": "What are you anyway — some kind of assistant?"}
+      ],
+      "assertions": [
+        {"type": "persona", "after_turn": 1, "forbidden_phrases": ["how can i help you", "how may i assist", "certainly!", "absolutely!"]},
+        {"type": "persona", "after_turn": 3, "forbidden_phrases": ["as an ai", "language model", "i'm an assistant"]}
+      ]
+    },
+    {
+      "id": "confidence_reinforcement",
+      "name": "Reinforcing facts boosts confidence",
+      "tags": ["reinforcement"],
+      "turns": [
+        {"role": "user", "content": "I'm vegetarian — have been for five years."},
+        {"role": "user", "content": "I still don't eat meat, not planning to."},
+        {"role": "user", "content": "My favorite food is masala dosa."}
+      ],
+      "assertions": [
+        {"type": "memory_active", "predicate": "likes", "expected_object": "masala dosa", "after_turn": 3},
+        {"type": "confidence_min", "text_contains": "vegetarian", "min_confidence": 0.75, "after_turn": 2}
+      ]
+    },
+    {
+      "id": "emotional_state",
+      "name": "Emotional state extraction",
+      "tags": ["emotional"],
+      "turns": [
+        {"role": "user", "content": "I'm feeling really anxious about tomorrow's presentation."},
+        {"role": "user", "content": "I barely slept last night."},
+        {"role": "user", "content": "Thanks for listening."}
+      ],
+      "assertions": [
+        {"type": "memory_active", "category": "emotional", "after_turn": 1},
+        {"type": "persona", "after_turn": 3, "forbidden_phrases": ["how can i help"]}
+      ]
+    },
+    {
+      "id": "multi_fact_turn",
+      "name": "Multiple facts in one message",
+      "tags": ["extraction"],
+      "turns": [
+        {"role": "user", "content": "I'm Priya, I live in Mumbai, and I run a small ceramics studio."},
+        {"role": "user", "content": "My studio is in Bandra."},
+        {"role": "user", "content": "What do you know about me?"}
+      ],
+      "assertions": [
+        {"type": "memory_count_min", "min_active": 2, "after_turn": 1},
+        {"type": "recall", "after_turn": 3, "must_contain_any": ["priya", "mumbai", "ceramics", "bandra"]}
+      ]
+    },
+    {
+      "id": "temporal_update",
+      "name": "Job change supersession",
+      "tags": ["contradiction", "biographical"],
+      "turns": [
+        {"role": "user", "content": "I work at Google in the Cloud team."},
+        {"role": "user", "content": "I've been there for four years."},
+        {"role": "user", "content": "I just accepted an offer at a climate tech startup."},
+        {"role": "user", "content": "I start next Monday."},
+        {"role": "user", "content": "Where do I work?"}
+      ],
+      "assertions": [
+        {"type": "memory_superseded", "predicate": "works_at", "expected_object": "google", "after_turn": 3},
+        {"type": "recall", "after_turn": 5, "must_contain_any": ["startup", "climate"]}
+      ]
+    },
+    {
+      "id": "relationship_memory",
+      "name": "Relationship facts",
+      "tags": ["relationship"],
+      "turns": [
+        {"role": "user", "content": "My partner Alex and I have been together six years."},
+        {"role": "user", "content": "Alex loves cycling — we ride every Sunday."},
+        {"role": "user", "content": "We got engaged last weekend!"},
+        {"role": "user", "content": "Tell me about Alex."}
+      ],
+      "assertions": [
+        {"type": "memory_active", "category": "relationship", "after_turn": 3},
+        {"type": "recall", "after_turn": 4, "must_contain_any": ["alex", "engaged", "cycling"]}
+      ]
+    },
+    {
+      "id": "noise_and_signal",
+      "name": "Ignore chitchat, retain signal",
+      "tags": ["extraction"],
+      "turns": [
+        {"role": "user", "content": "Hmm, the weather is weird today."},
+        {"role": "user", "content": "Anyway — my birthday is October 12."},
+        {"role": "user", "content": "lol random thought about pigeons"},
+        {"role": "user", "content": "When is my birthday?"}
+      ],
+      "assertions": [
+        {"type": "memory_active", "text_contains": "october", "after_turn": 2},
+        {"type": "recall", "after_turn": 4, "must_contain_any": ["october", "12"]}
+      ]
+    }
+  ],
+  "global_persona_checks": {
+    "forbidden_phrases": [
+      "how can i help you today",
+      "how may i assist",
+      "as an ai language model",
+      "as an ai",
+      "i'm just an ai",
+      "is there anything else i can help"
+    ]
+  },
+  "metrics": {
+    "recall_weight": 0.4,
+    "contradiction_weight": 0.35,
+    "persona_weight": 0.25
+  }
+}
