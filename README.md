@@ -1,4 +1,4 @@
-# CLI AI Companion
+# MAYA - a CLI AI Companion
 
 A production-grade terminal AI companion prototype with **long-term memory persistence**, **semantic retrieval**, **fact reconciliation** (contradiction handling), and **immutable persona guardrails**.
 
