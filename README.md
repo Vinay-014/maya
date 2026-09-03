@@ -2,6 +2,8 @@
 
 A terminal AI companion prototype with **long-term memory persistence**, **semantic retrieval**, **fact reconciliation** (contradiction handling), and **immutable persona guardrails**.
 
+https://github.com/Vinay-014/maya/blob/main/Screen%20Recording%202026-09-03%20223151.gif
+
 ## Features
 
 - **Structured fact extraction** — Pydantic schemas + LLM structured outputs extract subject/predicate/object facts from each turn
